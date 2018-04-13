@@ -5,14 +5,20 @@ import my_script
 
 
 class App(server.App):
-    title = "Simple App"
 
-    inputs = [
+	title = "Simple App"
+
+	inputs = [
     		{
     			"type" : "dropdown",
 	    		"label" : "Province",
 	    		"options" : [{"label": i,"value": i} for i in my_script.city_list()],
-	    		"key" : "province"},
+	    		"key" : "province1"},
+	    	{
+    			"type" : "dropdown",
+	    		"label" : "Province",
+	    		"options" : [{"label": i,"value": i} for i in my_script.city_list()],
+	    		"key" : "province2"},
     		{
 	    		"type" : "dropdown",
 	    		"label" : "Indexes",
@@ -21,6 +27,14 @@ class App(server.App):
 	    			{"label" : "TCI", "value" : "TCI"},
 	    			{"label":"VCI","value" : "VCI"}],
     			"key" : "index"},
+    		{
+				"type":'slider',
+				"label": 'Year',
+				"key": 'year',
+				"value" : 2017,
+				"min" : 1981,
+				"max" : 2017
+			},
     		{
 				"type":'slider',
 				"label": 'Min',
@@ -37,40 +51,75 @@ class App(server.App):
 				"min" : 0,
 				"max" : 53
 			}]
-    controls = [
+
+	tabs = ["Table_1", "Plot_1","Table_2", "Plot_2"]
+
+	controls = [
    			{
 				"type" : "button",
 				"label" : "Update",
 				"id" : "update_data"}]
-    outputs = [
+	outputs = [
+			{
+				"type" : "plot",
+				"id" : "plot1",
+				"control_id" : "update_data",
+				"tab" : "Plot_1"},
+			{
+				"type" : "plot",
+				"id" : "plot2",
+				"control_id" : "update_data",
+				"tab" : "Plot_2"},
     		{
     			"type" : "table",
-    			"id" : "table_id",
-    			"control_id" : "update_data"},
+    			"id" : "table_id_1",
+    			"control_id" : "update_data",
+    			"tab" : "Table_1"},
     		{
-    			"type" : "html",
-    			"id" : "some_html",
-    			"control_id" : "update_data"
-    		}]
+    			"type" : "table",
+    			"id" : "table_id_2",
+    			"control_id" : "update_data",
+    			"tab" : "Table_2"}]
 
 
-    def getHTML(self,params):
-    	min = params['freq1']
-    	max = params['freq2']
-    	if min > max: 
-    		return "Incorrect condition"
-    	return None
+	def table_id_1(self, params):
+		prov = params['province1']
+		ind = params['index']
+		min = params['freq1']
+		max = params['freq2']
+		year = params['year']
+		if min > max:
+			return None
+		df = my_script.data_frame_filter(province = prov,year=year, index = ind, min = min, max= max)
+		return df
 
-    def getData(self, params):
-    	prov = params['province']
-    	ind = params['index']
-    	min = params['freq1']
-    	max = params['freq2']
-    	if min > max:
-    		return None
-    	df = my_script.data_frame_filter(province = prov, index = ind, min = min, max= max)
-    	return df
+	def plot1(self, params):
+		df = self.table_id_1(params)
+		ind = params['index']
+		obj = df[ind]
+		plt_obj = obj.plot()
+		return plt_obj
+
+	def table_id_2(self, params):
+		prov = params['province2']
+		ind = params['index']
+		min = params['freq1']
+		max = params['freq2']
+		year = params['year']
+		if min > max:
+			return None
+		df = my_script.data_frame_filter(province = prov,year = year, index = ind, min = min, max= max)
+		return df
+
+	def plot2(self, params):
+		df = self.table_id_2(params)
+		ind = params['index']
+		obj = df[ind]
+		plt_obj = obj.plot()
+		return plt_obj
+
+
 
 
 app = App()
-app.launch()  
+app.launch()

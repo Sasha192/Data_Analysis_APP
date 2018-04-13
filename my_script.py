@@ -11,7 +11,7 @@ import time
 
 def city_list():
     string = str()
-    with open(r"C:\Users\Sasha192\Desktop\SpecProg_2rdLab\download_collection\cities.txt", "r") as file:
+    with open(r"C:\Users\Sasha192\Desktop\SpecProg_2nd_Lab\download_collection\cities.txt", "r") as file:
         string = file.readline()
     city_list = string.split(" ")
     city_list = ("".join(city_list)).split(",")
@@ -20,7 +20,7 @@ def city_list():
 
 
 def csv_file_name(province):
-    csv_list = fnmatch.filter(os.listdir(r"C:\Users\Sasha192\Desktop\SpecProg_2rdLab\download_collection\VHI"),"*.csv")
+    csv_list = fnmatch.filter(os.listdir(r"C:\Users\Sasha192\Desktop\SpecProg_2nd_Lab\download_collection\VHI"),"*.csv")
     file_name = str()
     for k in csv_list:
         if k.find(province) >= 0:
@@ -28,9 +28,10 @@ def csv_file_name(province):
             break
     return file_name
 
-def data_frame_filter(province, index = "VHI", min = 0, max = 53):
+def data_frame_filter(province,year = 2017, index = "VHI", min = 0, max = 53):
     file_name = csv_file_name(province)
-    df = pandas.read_csv(r"""C:\Users\Sasha192\Desktop\SpecProg_2rdLab\download_collection\VHI\{}""".format(file_name))
+    df = pandas.read_csv(r"""C:\Users\Sasha192\Desktop\SpecProg_2nd_Lab\download_collection\VHI\{}""".format(file_name))
     df = df[(df['week'] >= min) & (df['week'] <= max)]
-    filter_df = df[['year','week',index]]
+    df_1 = df[(df['year'] == year)]
+    filter_df = df_1[['year','week',index]]
     return filter_df
